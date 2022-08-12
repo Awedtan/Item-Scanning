@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import org.apache.poi.ss.usermodel.Row;
 
 public class Item implements Comparable<Item> {
@@ -9,6 +10,16 @@ public class Item implements Comparable<Item> {
     String name;
     int counted;
     boolean finished;
+
+    public Item(String upc, int qty, String[] arr) {
+        this.upc = upc;
+        this.qty = qty;
+
+        sku = arr[2];
+        color = arr[3];
+        size = arr[4];
+        name = String.join(" ", Arrays.copyOfRange(arr, 5, arr.length - 3));
+    }
 
     public Item(String upc, int qty, Row row) {
         this.upc = upc.trim();
@@ -38,7 +49,7 @@ public class Item implements Comparable<Item> {
             default:
                 break;
         }
-        
+
         name = row.getCell(7).getStringCellValue().trim();
     }
 
