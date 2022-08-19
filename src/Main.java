@@ -10,11 +10,11 @@ import technology.tabula.extractors.*;
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        HashMap<String, Integer> upc_qty = new HashMap<String, Integer>(); // Map of all UPCs and qtys
+        // HashMap<String, Integer> upc_qty = new HashMap<String, Integer>(); // Map of all UPCs and qtys
         HashMap<String, Item> items = new HashMap<String, Item>(); // Map of all items and qtys
 
         // Start of packing list extraction
-        File folder = new File("lists");
+        File folder = new File("download");
         for (File f : folder.listFiles()) {
             PDDocument pd = PDDocument.load(f);
             ObjectExtractor oe = new ObjectExtractor(pd);
@@ -57,6 +57,7 @@ public class Main {
                         } catch (NumberFormatException e) {
                         }
 
+                        // Put items into item map
                         if (items.get(upc) == null) {
                             items.put(upc, new Item(upc, qty, cellsSplit));
                         } else {
@@ -115,6 +116,7 @@ public class Main {
          * // End of SPI inventory extraction
          */
 
+         // Create window with items
         new MFrame(items);
     }
 }

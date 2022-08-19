@@ -6,7 +6,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-public class MFrame extends JFrame {
+public class MFrame extends JFrame implements ActionListener {
     static HashMap<String, Item> itemMap;
     static ArrayList<Item> itemList;
     static DefaultTableModel tableModel;
@@ -14,27 +14,29 @@ public class MFrame extends JFrame {
 
     static boolean listenTable = false;
 
+    JPanel topPanel;
+    JLabel mainLabel;
+    JTextField mainField;
+    JLabel countLabel;
+    JTextField countField;
+
+    JScrollPane scrollPanel;
+    JTable table;
+
+    JPanel bottomPanel;
+    JTextField skuField;
+    JTextField colField;
+    JTextField sizField;
+    JTextField namField;
+    JTextField upcField;
+    JButton clearButton;
+
+    String[] columnTitles;
+
     public MFrame(HashMap<String, Item> inMap) {
         itemMap = inMap;
 
-        JPanel topPanel;
-        JLabel mainLabel;
-        JTextField mainField;
-        JLabel countLabel;
-        JTextField countField;
-
-        JScrollPane scrollPanel;
-        JTable table;
-
-        JPanel bottomPanel;
-        JTextField skuField;
-        JTextField colField;
-        JTextField sizField;
-        JTextField namField;
-        JTextField upcField;
-        JButton clearButton;
-
-        String[] columnTitles = new String[] { "SKU", "Color", "Size", "Name", "UPC", "Qty", "Counted" };
+        columnTitles = new String[] { "SKU", "Color", "Size", "Name", "UPC", "Qty", "Counted" };
 
         itemList = new ArrayList<>();
         itemList.addAll(itemMap.values());
@@ -73,6 +75,28 @@ public class MFrame extends JFrame {
         table.setFont(new Font("SansSerif", Font.BOLD, 14));
         table.setRowHeight(20);
 
+        table.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int col) {
+
+                JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+                int qty = Integer.parseInt((tableModel.getValueAt(row, col - 1).toString()));
+                int cnt = Integer.parseInt(l.getText());
+
+                if (qty == cnt) {
+                    l.setBackground(Color.GREEN);
+                } else if (qty < cnt) {
+                    l.setBackground(Color.ORANGE);
+                } else {
+                    l.setBackground(Color.WHITE);
+                }
+
+                return l;
+            }
+        });
+
         table.getColumnModel().getColumn(0).setPreferredWidth(75);
         table.getColumnModel().getColumn(1).setPreferredWidth(50);
         table.getColumnModel().getColumn(2).setPreferredWidth(50);
@@ -95,20 +119,10 @@ public class MFrame extends JFrame {
         countField = new JTextField("1");
 
         mainField.setPreferredSize(new Dimension(500, 40));
-        mainField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Utils.scanBarcode(table, mainField, countField);
-            }
-        });
+        mainField.addActionListener(this);
 
         countField.setPreferredSize(new Dimension(40, 40));
-        countField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Utils.scanBarcode(table, mainField, countField);
-            }
-        });
+        countField.addActionListener(this);
 
         topPanel.add(mainLabel);
         topPanel.add(mainField);
@@ -127,24 +141,12 @@ public class MFrame extends JFrame {
         upcField = new JTextField();
 
         fieldArr = new JTextField[] { skuField, colField, sizField, namField, upcField };
+        for (JTextField jtf : fieldArr)
+            jtf.addActionListener(this);
 
         clearButton = new JButton();
         clearButton.setText("Clear selection");
-
-        for (JTextField jtf : fieldArr)
-            jtf.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    Utils.filterTableModel(fieldArr);
-                }
-            });
-
-        clearButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Utils.resetTableModel();
-            }
-        });
+        clearButton.addActionListener(this);
 
         skuField.setPreferredSize(new Dimension(75, 30));
         colField.setPreferredSize(new Dimension(50, 30));
@@ -179,5 +181,34 @@ public class MFrame extends JFrame {
         });
 
         listenTable = true;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == mainField) {
+            Utils.scanBarcode(table, mainField, countField);
+        }
+        if (e.getSource() == countField) {
+            Utils.scanBarcode(table, mainField, countField);
+        }
+        if (e.getSource() == skuField) {
+            Utils.filterTableModel(fieldArr);
+        }
+        if (e.getSource() == colField) {
+            Utils.filterTableModel(fieldArr);
+        }
+        if (e.getSource() == sizField) {
+            Utils.filterTableModel(fieldArr);
+        }
+        if (e.getSource() == namField) {
+            Utils.filterTableModel(fieldArr);
+        }
+        if (e.getSource() == upcField) {
+            Utils.filterTableModel(fieldArr);
+        }
+        if (e.getSource() == clearButton) {
+            Utils.resetTableModel();
+            for (JTextField jtf : fieldArr)
+                jtf.setText("");
+        }
     }
 }
