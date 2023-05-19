@@ -25,3 +25,9 @@ replay_pid*
 
 download/
 lib/
+
+*.bat
+nbproject/
+*.xml
+*.mf
+/build/

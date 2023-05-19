@@ -1,3 +1,4 @@
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -7,6 +8,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 public class MFrame extends JFrame implements ActionListener {
+
     static HashMap<String, Item> itemMap;
     static ArrayList<Item> itemList;
     static DefaultTableModel tableModel;
@@ -36,7 +38,7 @@ public class MFrame extends JFrame implements ActionListener {
     public MFrame(HashMap<String, Item> inMap) {
         itemMap = inMap;
 
-        columnTitles = new String[] { "SKU", "Color", "Size", "Name", "UPC", "Qty", "Counted" };
+        columnTitles = new String[]{"SKU", "Color", "Size", "Name", "UPC", "Qty", "Counted"};
 
         itemList = new ArrayList<>();
         itemList.addAll(itemMap.values());
@@ -46,30 +48,34 @@ public class MFrame extends JFrame implements ActionListener {
         tableModel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                if (column == 6)
+                if (column == 6) {
                     return true;
+                }
                 return false;
             }
         };
 
         tableModel.addTableModelListener(
                 new TableModelListener() {
-                    public void tableChanged(TableModelEvent e) {
-                        if (!listenTable)
-                            return;
+            public void tableChanged(TableModelEvent e) {
+                if (!listenTable) {
+                    return;
+                }
 
-                        int row = e.getFirstRow();
-                        int column = e.getColumn();
-                        TableModel model = (TableModel) e.getSource();
-                        Object value = model.getValueAt(row, column);
-                        itemList.get(row).counted = Integer.parseInt(value.toString());
-                    }
-                });
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+                TableModel model = (TableModel) e.getSource();
+                Object value = model.getValueAt(row, column);
+                itemList.get(row).counted = Integer.parseInt(value.toString());
+            }
+        });
 
-        for (String s : columnTitles)
+        for (String s : columnTitles) {
             tableModel.addColumn(s);
-        for (Item i : itemList)
+        }
+        for (Item i : itemList) {
             tableModel.insertRow(tableModel.getRowCount(), i.getData());
+        }
 
         table = new JTable(tableModel);
         table.setFont(new Font("SansSerif", Font.BOLD, 14));
@@ -120,6 +126,19 @@ public class MFrame extends JFrame implements ActionListener {
 
         mainField.setPreferredSize(new Dimension(500, 40));
         mainField.addActionListener(this);
+        mainField.addKeyListener(new KeyListener() {
+            public void keyPressed(KeyEvent e) {
+            }
+
+            public void keyReleased(KeyEvent e) {
+            }
+
+            public void keyTyped(KeyEvent e) {
+                if (mainField.getText().length() == 12) {
+                    Utils.scanBarcode(table, mainField, countField);
+                }
+            }
+        });
 
         countField.setPreferredSize(new Dimension(40, 40));
         countField.addActionListener(this);
@@ -140,9 +159,10 @@ public class MFrame extends JFrame implements ActionListener {
         namField = new JTextField();
         upcField = new JTextField();
 
-        fieldArr = new JTextField[] { skuField, colField, sizField, namField, upcField };
-        for (JTextField jtf : fieldArr)
+        fieldArr = new JTextField[]{skuField, colField, sizField, namField, upcField};
+        for (JTextField jtf : fieldArr) {
             jtf.addActionListener(this);
+        }
 
         clearButton = new JButton();
         clearButton.setText("Clear selection");
@@ -155,8 +175,9 @@ public class MFrame extends JFrame implements ActionListener {
         upcField.setPreferredSize(new Dimension(75, 30));
         clearButton.setPreferredSize(new Dimension(225, 30));
 
-        for (JTextField jtf : fieldArr)
+        for (JTextField jtf : fieldArr) {
             bottomPanel.add(jtf);
+        }
         bottomPanel.add(clearButton);
 
         // Frame
@@ -207,8 +228,9 @@ public class MFrame extends JFrame implements ActionListener {
         }
         if (e.getSource() == clearButton) {
             Utils.resetTableModel();
-            for (JTextField jtf : fieldArr)
+            for (JTextField jtf : fieldArr) {
                 jtf.setText("");
+            }
         }
     }
 }
